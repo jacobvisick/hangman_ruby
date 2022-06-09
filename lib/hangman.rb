@@ -86,14 +86,16 @@ class Hangman
 
     def save_game
         state = serialize_state
-        date = "#{Time.now.month}/#{Time.now.day} @ #{Time.now.hour}:#{Time.now.min.to_s.rjust(2,'0')}"
+        date = "#{Time.now.month}-#{Time.now.day} @ #{Time.now.hour}:#{Time.now.min.to_s.rjust(2,'0')}"
         
         Dir.mkdir('saved_games') unless Dir.exist?('saved_games')
         filename = "saved_games/#{date}.save"
 
-        File.open(filename, 'w') { |file| file.puts state }
+        File.open(filename, 'w') do |file| 
+            file.puts state
+        end
     end
 
 end
 
-Hangman.new.play
+#Hangman.new.play
