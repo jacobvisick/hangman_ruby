@@ -12,6 +12,7 @@ class Hangman
 
         puts revealed_letters
         puts "You have #{MAX_GUESSES - @incorrect_guesses} incorrect guesses left."
+        puts "Enter 'save' or 'exit' to stop playing."
     end
 
     def play
@@ -21,7 +22,12 @@ class Hangman
 
             @incorrect_guesses += 1 unless @secret_word.include?(guess)
 
-            puts revealed_letters
+            puts "\n" + revealed_letters
+
+            print "Letters guessed: "
+            @guessed_letters.sort.each { |c| print c }
+            print "\n\n"
+
             puts "You have #{MAX_GUESSES - @incorrect_guesses} guesses left."
         end
 
@@ -47,11 +53,13 @@ class Hangman
     end
 
     def validate_guess(guess)
-        if guess.length != 1
-            puts "Only one letter at a time, please."
-            guess = validate_guess(prompt_for_guess)
+        if guess.downcase == "save" || guess.downcase == "exit"
+            save_and_quit
         elsif @guessed_letters.include?(guess)
             puts "You've already guessed #{guess}."
+            guess = validate_guess(prompt_for_guess)
+        elsif guess.length != 1
+            puts "Only one letter at a time, please."
             guess = validate_guess(prompt_for_guess)
         else
             guess
@@ -73,6 +81,14 @@ class Hangman
         result
     end
 
+    def save_and_quit
+        puts "Would you like to save before quitting? (y / n)"
+        confirmation = gets.chomp.downcase
+
+        confirmation == 'y' ? save_game : exit
+        exit
+    end
+
     def serialize_state
         MessagePack.dump({
             secret_word: @secret_word,
@@ -88,6 +104,7 @@ class Hangman
     end
 
     def save_game
+        puts "Saving game..."
         date = "#{Time.now.month}-#{Time.now.day} @ #{Time.now.hour}:#{Time.now.min.to_s.rjust(2,'0')}"
         
         Dir.mkdir('saved_games') unless Dir.exist?('saved_games')
