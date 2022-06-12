@@ -77,7 +77,7 @@ class Hangman
         MessagePack.dump({
             secret_word: @secret_word,
             guessed_letters: @guessed_letters,
-            incorrect_guesses: @incorrect_guesses
+            incorrect_guesses: @incorrect_guesses,
             filename: @filename
         })
     end
@@ -95,12 +95,13 @@ class Hangman
 
         state = serialize_state
 
-        File.open(@filename, 'w') { |file| file.puts state }
+        File.open(@filename, 'w') { |file| file.print state }
+    end
+
+    def self.load_game(filename)
+        #returns Hangman instance
+        state = File.read(filename)
+        self.unserialize_state(state)
     end
 
 end
-
-saved_games = Dir.glob('saved_games/*.save')
-
-if saved_games.length > 0
-    puts "There are saved games!"
