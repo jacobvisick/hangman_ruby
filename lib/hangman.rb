@@ -91,9 +91,7 @@ class Hangman
         Dir.mkdir('saved_games') unless Dir.exist?('saved_games')
         filename = "saved_games/#{date}.save"
 
-        File.open(filename, 'w') do |file| 
-            file.puts state
-        end
+        File.open(filename, 'w') { |file| file.puts state }
     end
 
 end
