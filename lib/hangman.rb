@@ -15,6 +15,7 @@ class Hangman
         puts "Enter 'save' or 'exit' to stop playing."
     end
 
+    public
     def play
         while @incorrect_guesses < MAX_GUESSES && revealed_letters.include?('_') do
             guess = validate_guess(prompt_for_guess)
@@ -35,6 +36,18 @@ class Hangman
         File.delete(@filename) unless @filename == nil
     end
 
+    def self.load_game(filename)
+        #returns Hangman instance
+        state = File.read(filename)
+        self.unserialize_state(state)
+    end
+
+    def self.unserialize_state(data)
+        state = MessagePack.load(data)
+        self.new(state['secret_word'], state['guessed_letters'], state['incorrect_guesses'], state['filename'])
+    end
+
+    private
     def game_won
         puts "You win! You guessed #{@secret_word} with #{MAX_GUESSES - @incorrect_guesses} guesses left."
     end
@@ -98,11 +111,6 @@ class Hangman
         })
     end
 
-    def self.unserialize_state(data)
-        state = MessagePack.load(data)
-        self.new(state['secret_word'], state['guessed_letters'], state['incorrect_guesses'], state['filename'])
-    end
-
     def save_game
         puts "Saving game..."
         date = "#{Time.now.month}-#{Time.now.day} @ #{Time.now.hour}:#{Time.now.min.to_s.rjust(2,'0')}"
@@ -113,12 +121,6 @@ class Hangman
         state = serialize_state
 
         File.open(@filename, 'w') { |file| file.print state }
-    end
-
-    def self.load_game(filename)
-        #returns Hangman instance
-        state = File.read(filename)
-        self.unserialize_state(state)
     end
 
 end
