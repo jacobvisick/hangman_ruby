@@ -4,10 +4,11 @@ DICTIONARY = File.readlines('res/valid_words.txt', chomp: true)
 MAX_GUESSES = 6
 
 class Hangman
-    def initialize(secret_word = get_random_word, guessed_letters = [], incorrect_guesses = 0)
+    def initialize(secret_word = get_random_word, guessed_letters = [], incorrect_guesses = 0, filename = nil)
         @secret_word = secret_word
         @guessed_letters = guessed_letters
         @incorrect_guesses = incorrect_guesses
+        @filename = filename
 
         puts revealed_letters
         puts "You have #{MAX_GUESSES - @incorrect_guesses} incorrect guesses left."
@@ -25,6 +26,7 @@ class Hangman
         end
 
         revealed_letters.include?('_') ? game_lost : game_won
+        File.delete(@filename) unless @filename == nil
     end
 
     def game_won
@@ -76,24 +78,29 @@ class Hangman
             secret_word: @secret_word,
             guessed_letters: @guessed_letters,
             incorrect_guesses: @incorrect_guesses
+            filename: @filename
         })
     end
 
     def self.unserialize_state(data)
         state = MessagePack.load(data)
-        self.new(state['secret_word'], state['guessed_letters'], state['incorrect_guesses'])
+        self.new(state['secret_word'], state['guessed_letters'], state['incorrect_guesses'], state['filename'])
     end
 
     def save_game
-        state = serialize_state
         date = "#{Time.now.month}-#{Time.now.day} @ #{Time.now.hour}:#{Time.now.min.to_s.rjust(2,'0')}"
         
         Dir.mkdir('saved_games') unless Dir.exist?('saved_games')
-        filename = "saved_games/#{date}.save"
+        @filename = "saved_games/#{date}.save"
 
-        File.open(filename, 'w') { |file| file.puts state }
+        state = serialize_state
+
+        File.open(@filename, 'w') { |file| file.puts state }
     end
 
 end
 
-#Hangman.new.play
+saved_games = Dir.glob('saved_games/*.save')
+
+if saved_games.length > 0
+    puts "There are saved games!"
