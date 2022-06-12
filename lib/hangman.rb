@@ -114,7 +114,7 @@ class Hangman
     public
     def save_game
         puts "Saving game..."
-        date = "#{Time.now.month}-#{Time.now.day} @ #{Time.now.hour}\:#{Time.now.min.to_s.rjust(2,'0')}"
+        date = "#{Time.now.month}-#{Time.now.day} @ #{Time.now.hour}:#{Time.now.min.to_s.rjust(2,'0')}"
         
         Dir.mkdir('saved_games') unless Dir.exist?('saved_games')
         @filename = "saved_games/#{date}.save"
@@ -132,9 +132,7 @@ class Hangman
             @filename += ".save"
         end
 
-        state = serialize_state
-
-        File.open(@filename, 'w') { |file| file.print state }
+        File.open(@filename, 'w') { |file| file.print serialize_state }
     end
 
 end
