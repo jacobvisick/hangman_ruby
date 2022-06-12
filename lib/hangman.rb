@@ -111,12 +111,26 @@ class Hangman
         })
     end
 
+    public
     def save_game
         puts "Saving game..."
-        date = "#{Time.now.month}-#{Time.now.day} @ #{Time.now.hour}:#{Time.now.min.to_s.rjust(2,'0')}"
+        date = "#{Time.now.month}-#{Time.now.day} @ #{Time.now.hour}\:#{Time.now.min.to_s.rjust(2,'0')}"
         
         Dir.mkdir('saved_games') unless Dir.exist?('saved_games')
         @filename = "saved_games/#{date}.save"
+
+        if File.exist?(@filename)
+            @filename.delete_suffix!(".save")
+            tries = 1
+
+            @filename = @filename + " (#{tries})"
+            while File.exist?(@filename + ".save")
+                tries += 1
+                @filename[-2] = tries.to_s
+            end
+
+            @filename += ".save"
+        end
 
         state = serialize_state
 
